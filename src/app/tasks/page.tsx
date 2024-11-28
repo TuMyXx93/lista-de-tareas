@@ -1,6 +1,6 @@
 'use client';
 import { Button, Divider, Group, Stack, TextInput, Title } from "@mantine/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TaskCard } from "./components/task-card";
 
 export type Task = {
@@ -11,11 +11,19 @@ export type Task = {
 export default function TasksPage() {
 
     const [task, setTask] = useState<string>("");
-    const [tasks, setTasks] = useState<Task[]>([]);
+    const [tasks, setTasks] = useState<Task[]>(() => {
+        // Cargar tareas del localStorage
+        const savedTasks = localStorage.getItem('tasks');
+        return savedTasks ? JSON.parse(savedTasks) : [];
+    });
 
+    useEffect(() => {
+        // Guardar tareas en localStorage cuando cambien
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }, [tasks]);
 
     const addTask = () => {
-        if (task !== "") {
+        if (task.trim() !== "") {
             setTasks([
                 ...tasks,
                 {
@@ -23,9 +31,15 @@ export default function TasksPage() {
                     done: false
                 }
             ]);
+            setTask(""); // Limpiar input
         }
     };
 
+    const handleKeyPress = (event: React.KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            addTask();
+        }
+    };
 
     const markTaskDone = (index: number) => {
         const newTasks = tasks.map((task, i) => {
@@ -47,22 +61,35 @@ export default function TasksPage() {
 
     return (
         <Stack
-            style={{ maxWidth: "50%", padding: 20 }}
+            style={{ 
+                maxWidth: '800px', 
+                width: '90%', 
+                margin: '0 auto', 
+                padding: '20px' 
+            }}
         >
-            <Group>
+            <Group wrap="wrap" style={{ width: '100%' }}>
                 <TextInput
+                    style={{ flex: 1, minWidth: '200px' }}
                     size="md"
                     label="¿Cuál es la siguiente tarea?"
                     withAsterisk
                     description="Ingresa la siguiente tarea que deseas realizar"
                     placeholder="Describe tu tarea"
+                    value={task}
                     onChange={(event) => setTask(event.target.value)}
+                    onKeyPress={handleKeyPress}
                 />
-                <Button onClick={addTask} color="blue" variant="outline">
+                <Button 
+                    onClick={addTask} 
+                    color="blue" 
+                    variant="outline"
+                    disabled={task.trim() === ""}
+                    style={{ marginTop: '24px' }}
+                >
                     Agregar tarea
                 </Button>
             </Group>
-            {task}
             <Title order={2}>
                 Tareas {tasks?.length}:
             </Title>

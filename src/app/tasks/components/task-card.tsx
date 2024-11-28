@@ -15,7 +15,12 @@ export const TaskCard = ({ task, index, handleCheck, handleDelete }: TaskCardPro
                 checked={task.done}
                 onChange={() => handleCheck(index)}
             />
-            <Text>
+            <Text
+                style={{
+                    textDecoration: task.done ? 'line-through' : 'none',
+                    color: task.done ? '#666' : 'inherit'
+                }}
+            >
                 {index}.{task.description}
             </Text>
             <Button

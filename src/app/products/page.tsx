@@ -1,9 +1,11 @@
+import { Container, Title } from '@mantine/core';
+
 export default function ProductsPage() {
     return (
-        <div>
-            <h1>
+        <Container size="lg" py="xl">
+            <Title order={1}>
                 Lista de Productos
-            </h1>
-        </div>
+            </Title>
+        </Container>
     );
 }
